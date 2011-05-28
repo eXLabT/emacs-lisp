@@ -122,6 +122,13 @@ defined sdk directory. Defaults to `android-mode-sdk-dir'."
        (setq android-exclusive-processes (cons (intern name)
                                                android-exclusive-processes))))
 
+(defun android-jni ()
+  "Look for Android.mk file to find jni folder."
+  (locate-dominating-file default-directory "Android.mk"))
+
+(defmacro android-in-jni (body)
+  `(let ((default-directory (android-jni)))
+     ,body))
 
                                         ; emulator
 
@@ -276,7 +283,13 @@ defined sdk directory. Defaults to `android-mode-sdk-dir'."
 (android-defun-ant-task "compile")
 (android-defun-ant-task "install")
 (android-defun-ant-task "uninstall")
+                                        ; ndk
 
+(defun android-ndk-build (target)
+  "Run ndk-build in the project jni directory."
+  (interactive "sTarget: ")
+  (android-in-jni
+   (compile (concat android-mode-ndk-dir "ndk-build " target))))
 
                                         ; mode
 
